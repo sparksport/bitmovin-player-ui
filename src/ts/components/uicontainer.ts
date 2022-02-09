@@ -138,9 +138,12 @@ export class UIContainer extends Container<UIContainerConfig> {
           // tap which 1. reveals the UI and 2. starts playback.
           if (isFirstTouch && !player.isPlaying()) {
             isFirstTouch = false;
+          } else {
+            e.preventDefault();
           }
           showUi();
         } else {
+          e.preventDefault();
           hideUi();
         }
       },
