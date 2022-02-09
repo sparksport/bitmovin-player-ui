@@ -142,19 +142,9 @@ export class UIContainer extends Container<UIContainerConfig> {
             e.preventDefault();
           }
           showUi();
+        } else {
+          hideUi();
         }
-      },
-    }, {
-      // When the mouse enters, we show the UI
-      name: 'mouseenter',
-      handler: () => {
-        showUi();
-      },
-    }, {
-      // When the mouse moves within, we show the UI
-      name: 'mousemove',
-      handler: () => {
-        showUi();
       },
     }, {
       name: 'focusin',
