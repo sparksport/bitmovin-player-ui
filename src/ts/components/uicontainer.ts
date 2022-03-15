@@ -135,7 +135,6 @@ export class UIContainer extends Container<UIContainerConfig> {
         }
       });
     }
-
     // Timeout to defer UI hiding by the configured delay time
     this.uiHideTimeout = new Timeout(config.hideDelay, hideUi);
 
