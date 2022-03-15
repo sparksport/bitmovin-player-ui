@@ -7,6 +7,8 @@ import { CancelEventArgs, EventDispatcher } from '../eventdispatcher';
 import { PlayerAPI, PlayerResizedEvent } from 'bitmovin-player';
 import { i18n } from '../localization/i18n';
 
+declare const window: any;
+
 /**
  * Configuration interface for a {@link UIContainer}.
  */
@@ -123,6 +125,16 @@ export class UIContainer extends Container<UIContainerConfig> {
         }
       }
     };
+
+    if (window.bitmovin.customMessageHandler) {
+      window.bitmovin.customMessageHandler.on('configureUIShowHide', () => {
+        if (isUiShown) {
+          hideUi();
+        } else {
+          showUi();
+        }
+      });
+    }
 
     // Timeout to defer UI hiding by the configured delay time
     this.uiHideTimeout = new Timeout(config.hideDelay, hideUi);
