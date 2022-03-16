@@ -91,6 +91,7 @@ export class UIContainer extends Container<UIContainerConfig> {
     let isSeeking = false;
     let isFirstTouch = true;
     let playerState: PlayerUtils.PlayerState;
+    let isUiBlocked = false;
 
     const hidingPrevented = (): boolean => {
       return config.hidePlayerStateExceptions && config.hidePlayerStateExceptions.indexOf(playerState) > -1;
@@ -127,12 +128,12 @@ export class UIContainer extends Container<UIContainerConfig> {
     };
 
     if (window.bitmovin.customMessageHandler) {
-      window.bitmovin.customMessageHandler.on('configureUIShowHide', () => {
-        if (isUiShown) {
-          hideUi();
-        } else {
-          showUi();
-        }
+      window.bitmovin.customMessageHandler.on('blockUi', () => {
+        hideUi();
+        isUiBlocked = true;
+      });
+      window.bitmovin.customMessageHandler.on('unblockUi', () => {
+        isUiBlocked = false;
       });
     }
     // Timeout to defer UI hiding by the configured delay time
@@ -142,43 +143,53 @@ export class UIContainer extends Container<UIContainerConfig> {
       // On touch displays, the first touch reveals the UI
       name: 'touchend',
       handler: (e) => {
-        if (!isUiShown) {
-          // Only if the UI is hidden, we prevent other actions (except for the first touch) and reveal the UI
-          // instead. The first touch is not prevented to let other listeners receive the event and trigger an
-          // initial action, e.g. the huge playback button can directly start playback instead of requiring a double
-          // tap which 1. reveals the UI and 2. starts playback.
-          if (isFirstTouch && !player.isPlaying()) {
-            isFirstTouch = false;
+        if (!isUiBlocked) {
+          if (!isUiShown) {
+            // Only if the UI is hidden, we prevent other actions (except for the first touch) and reveal the UI
+            // instead. The first touch is not prevented to let other listeners receive the event and trigger an
+            // initial action, e.g. the huge playback button can directly start playback instead of requiring a double
+            // tap which 1. reveals the UI and 2. starts playback.
+            if (isFirstTouch && !player.isPlaying()) {
+              isFirstTouch = false;
+            } else {
+              e.preventDefault();
+            }
+            showUi();
           } else {
             e.preventDefault();
+            hideUi();
           }
-          showUi();
-        } else {
-          e.preventDefault();
-          hideUi();
         }
       },
     }, {
       // When the mouse enters, we show the UI
       name: 'mouseenter',
       handler: () => {
-        showUi();
+        if (!isUiBlocked) {
+          showUi();
+        }
       },
     }, {
       // When the mouse moves within, we show the UI
       name: 'mousemove',
       handler: () => {
-        showUi();
+        if (!isUiBlocked) {
+          showUi();
+        }
       },
     }, {
       name: 'focusin',
       handler: () => {
-        showUi();
+        if (!isUiBlocked) {
+          showUi();
+        }
       },
     }, {
       name: 'keydown',
       handler: () => {
-        showUi();
+        if (!isUiBlocked) {
+          showUi();
+        }
       },
     }, {
       // When the mouse leaves, we can prepare to hide the UI, except a seek is going on
