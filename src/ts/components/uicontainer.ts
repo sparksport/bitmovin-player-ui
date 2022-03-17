@@ -98,14 +98,16 @@ export class UIContainer extends Container<UIContainerConfig> {
     };
 
     let showUi = () => {
-      if (!isUiShown) {
-        // Let subscribers know that they should reveal themselves
-        uimanager.onControlsShow.dispatch(this);
-        isUiShown = true;
-      }
-      // Don't trigger timeout while seeking (it will be triggered once the seek is finished) or casting
-      if (!isSeeking && !player.isCasting() && !hidingPrevented()) {
-        this.uiHideTimeout.start();
+      if (!isUiBlocked) {
+        if (!isUiShown) {
+          // Let subscribers know that they should reveal themselves
+          uimanager.onControlsShow.dispatch(this);
+          isUiShown = true;
+        }
+        // Don't trigger timeout while seeking (it will be triggered once the seek is finished) or casting
+        if (!isSeeking && !player.isCasting() && !hidingPrevented()) {
+          this.uiHideTimeout.start();
+        }
       }
     };
 
@@ -165,31 +167,23 @@ export class UIContainer extends Container<UIContainerConfig> {
       // When the mouse enters, we show the UI
       name: 'mouseenter',
       handler: () => {
-        if (!isUiBlocked) {
-          showUi();
-        }
+        showUi();
       },
     }, {
       // When the mouse moves within, we show the UI
       name: 'mousemove',
       handler: () => {
-        if (!isUiBlocked) {
-          showUi();
-        }
+        showUi();
       },
     }, {
       name: 'focusin',
       handler: () => {
-        if (!isUiBlocked) {
-          showUi();
-        }
+        showUi();
       },
     }, {
       name: 'keydown',
       handler: () => {
-        if (!isUiBlocked) {
-          showUi();
-        }
+        showUi();
       },
     }, {
       // When the mouse leaves, we can prepare to hide the UI, except a seek is going on
