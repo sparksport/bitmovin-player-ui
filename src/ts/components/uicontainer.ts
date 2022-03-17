@@ -162,7 +162,7 @@ export class UIContainer extends Container<UIContainerConfig> {
             hideUi();
           }
         } else {
-          e.preventDefault()
+          e.preventDefault();
         }
       },
     }, {
