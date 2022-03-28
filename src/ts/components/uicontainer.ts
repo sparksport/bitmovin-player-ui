@@ -158,8 +158,11 @@ export class UIContainer extends Container<UIContainerConfig> {
             }
             showUi();
           } else {
-            hideUi();
-            e.preventDefault();
+            if (hidingPrevented()) {
+              e.preventDefault();
+            } else {
+              hideUi();
+            }
           }
         } else {
           e.preventDefault();
