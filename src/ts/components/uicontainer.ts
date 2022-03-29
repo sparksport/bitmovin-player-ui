@@ -89,6 +89,7 @@ export class UIContainer extends Container<UIContainerConfig> {
     let isSeeking = false;
     let isFirstTouch = true;
     let playerState: PlayerUtils.PlayerState;
+    let isTouchDevice = window.hasOwnProperty('ontouchstart');
 
     const hidingPrevented = (): boolean => {
       return config.hidePlayerStateExceptions && config.hidePlayerStateExceptions.indexOf(playerState) > -1;
@@ -130,8 +131,8 @@ export class UIContainer extends Container<UIContainerConfig> {
     this.userInteractionEvents = [{
       // On touch displays, the first touch reveals the UI
       name: 'touchend',
-      handler: (e) => {
-        if (!isUiShown) {
+      handler: (e: Event) => {
+        if (!isUiShown || e.defaultPrevented) {
           // Only if the UI is hidden, we prevent other actions (except for the first touch) and reveal the UI
           // instead. The first touch is not prevented to let other listeners receive the event and trigger an
           // initial action, e.g. the huge playback button can directly start playback instead of requiring a double
@@ -142,19 +143,21 @@ export class UIContainer extends Container<UIContainerConfig> {
             e.preventDefault();
           }
           showUi();
+        } else {
+          hideUi();
         }
       },
     }, {
       // When the mouse enters, we show the UI
       name: 'mouseenter',
       handler: () => {
-        showUi();
+        !isTouchDevice && showUi();
       },
     }, {
       // When the mouse moves within, we show the UI
       name: 'mousemove',
       handler: () => {
-        showUi();
+          !isTouchDevice && showUi();
       },
     }, {
       name: 'focusin',
