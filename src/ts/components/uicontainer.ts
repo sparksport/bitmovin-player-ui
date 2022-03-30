@@ -1,11 +1,12 @@
-import {ContainerConfig, Container} from './container';
+import {Container, ContainerConfig} from './container';
 import {UIInstanceManager} from '../uimanager';
 import {DOM} from '../dom';
 import {Timeout} from '../timeout';
 import {PlayerUtils} from '../playerutils';
-import { CancelEventArgs, EventDispatcher } from '../eventdispatcher';
-import { PlayerAPI, PlayerResizedEvent } from 'bitmovin-player';
-import { i18n } from '../localization/i18n';
+import {CancelEventArgs, EventDispatcher} from '../eventdispatcher';
+import {PlayerAPI, PlayerResizedEvent} from 'bitmovin-player';
+import {i18n} from '../localization/i18n';
+import {BrowserUtils} from '../browserutils';
 
 /**
  * Configuration interface for a {@link UIContainer}.
@@ -89,7 +90,6 @@ export class UIContainer extends Container<UIContainerConfig> {
     let isSeeking = false;
     let isFirstTouch = true;
     let playerState: PlayerUtils.PlayerState;
-    let isTouchDevice = window.hasOwnProperty('ontouchstart');
 
     const hidingPrevented = (): boolean => {
       return config.hidePlayerStateExceptions && config.hidePlayerStateExceptions.indexOf(playerState) > -1;
@@ -151,13 +151,13 @@ export class UIContainer extends Container<UIContainerConfig> {
       // When the mouse enters, we show the UI
       name: 'mouseenter',
       handler: () => {
-        !isTouchDevice && showUi();
+        !BrowserUtils.isTouchSupported && showUi();
       },
     }, {
       // When the mouse moves within, we show the UI
       name: 'mousemove',
       handler: () => {
-          !isTouchDevice && showUi();
+        !BrowserUtils.isTouchSupported && showUi();
       },
     }, {
       name: 'focusin',
@@ -192,6 +192,9 @@ export class UIContainer extends Container<UIContainerConfig> {
       if (!hidingPrevented()) {
         this.uiHideTimeout.start(); // Re-enable UI hide timeout after a seek
       }
+    });
+    player.on(player.exports.PlayerEvent.TimeShift, () => {
+        showUi();
     });
     player.on(player.exports.PlayerEvent.CastStarted, () => {
       showUi(); // Show UI when a Cast session has started (UI will then stay permanently on during the session)
