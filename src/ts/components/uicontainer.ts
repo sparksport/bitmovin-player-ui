@@ -114,7 +114,7 @@ export class UIContainer extends Container<UIContainerConfig> {
 
     let hideUi = () => {
       // Hide the UI only if it is shown, and if not casting
-      if (isUiShown && !player.isCasting()) {
+      if (isUiShown && !player.isCasting() && !player.isAirplayActive()) {
         // Issue a preview event to check if we are good to hide the controls
         let previewHideEventArgs = <CancelEventArgs>{};
         uimanager.onPreviewControlsHide.dispatch(this, previewHideEventArgs);
