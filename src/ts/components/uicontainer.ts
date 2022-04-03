@@ -93,6 +93,7 @@ export class UIContainer extends Container<UIContainerConfig> {
     let isFirstTouch = true;
     let playerState: PlayerUtils.PlayerState;
     let isUiBlocked = false;
+    let isAirplayActive = BrowserUtils.isIOS && player.isAirplayActive();
 
     const hidingPrevented = (): boolean => {
       return config.hidePlayerStateExceptions && config.hidePlayerStateExceptions.indexOf(playerState) > -1;
@@ -113,8 +114,8 @@ export class UIContainer extends Container<UIContainerConfig> {
     };
 
     let hideUi = () => {
-      // Hide the UI only if it is shown, and if not casting
-      if (isUiShown && !player.isCasting() && !player.isAirplayActive()) {
+      // Hide the UI only if it is shown, and if not casting, and if not Airplaying on Ios
+      if (isUiShown && !player.isCasting() && !isAirplayActive) {
         // Issue a preview event to check if we are good to hide the controls
         let previewHideEventArgs = <CancelEventArgs>{};
         uimanager.onPreviewControlsHide.dispatch(this, previewHideEventArgs);
