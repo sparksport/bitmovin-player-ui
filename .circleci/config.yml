@@ -3,7 +3,7 @@ version: 2.1
 executors:
   minimal_node_executor:
     docker:
-      - image: node:14.19-alpine
+      - image: node:14.18.2-buster
         user: node
     resource_class: large
     working_directory: ~/webclient
@@ -25,8 +25,6 @@ jobs:
       - run: 'echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" >> ~/webclient/.npmrc'
       - run: npm ci
       - run: npm test
-      - run: apk add github-cli
-      - run: gh auth login --with-token ${GITHUB_ACCESS_TOKEN}
       - run: npm publish
 
 workflows:
