@@ -26,6 +26,7 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: apk add github-cli
+      - run: gh auth login --with-token ${GITHUB_ACCESS_TOKEN}
       - run: npm run prepare
       - run: npm publish
 
