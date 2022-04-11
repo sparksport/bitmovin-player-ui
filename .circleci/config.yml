@@ -3,7 +3,7 @@ version: 2.1
 executors:
   minimal_node_executor:
     docker:
-      - image: node:14.18.2-buster
+      - image: node:14.19-alpine
         user: node
     resource_class: large
     working_directory: ~/webclient
