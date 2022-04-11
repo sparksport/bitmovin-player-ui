@@ -24,7 +24,7 @@ jobs:
       - checkout
       - run: 'echo "scripts-prepend-node-path=true" >> ~/webclient/.npmrc'
       - run: 'echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" >> ~/webclient/.npmrc'
-      - run: sudo npm ci
+      - run: npm ci
       - run: npm test
       - run: npm run prepare
       - run: npm publish
