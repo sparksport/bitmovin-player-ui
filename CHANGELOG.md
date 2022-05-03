@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - Lots of CICD improvements! 
 
-## [3.37.0]
+## [3.37.0] - 2022-04-12
 
 ### Fixed
 - Incorrect line alignment for subtitle cues from WebVTT tracks.
