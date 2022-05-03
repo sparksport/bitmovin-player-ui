@@ -16,6 +16,17 @@ jobs:
       - run: 'echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" >> ~/webclient/.npmrc'
       - run: npm ci
       - run: npm test
+  npm-publish-beta:
+    executor: node_root_executor
+    steps: 
+      - checkout
+      - run: 'echo "scripts-prepend-node-path=true" >> ~/webclient/.npmrc'
+      - run: 'echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" >> ~/webclient/.npmrc'
+      - run: npm ci
+      - run: npm install --global cross-env
+      - run: npm run add-version-suffix
+      - run: npm run prepare
+      - run: npm publish --tag beta
   npm-publish-main:
     executor: minimal_node_executor
     steps:
@@ -24,6 +35,7 @@ jobs:
       - run: 'echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" >> ~/webclient/.npmrc'
       - run: npm ci
       - run: npm test
+      - run: npm run prepare
       - run: npm publish
 
 workflows:
