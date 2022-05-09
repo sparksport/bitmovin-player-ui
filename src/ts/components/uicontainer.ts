@@ -183,13 +183,13 @@ export class UIContainer extends Container<UIContainerConfig> {
       // When the mouse enters, we show the UI
       name: 'mouseenter',
       handler: () => {
-        !BrowserUtils.isMobile && !BrowserUtils.isTouchSupported && showUi();
+        (!BrowserUtils.isAndroid || !BrowserUtils.isIOS) && !BrowserUtils.isTouchSupported && showUi();
       },
     }, {
       // When the mouse moves within, we show the UI
       name: 'mousemove',
       handler: () => {
-        !BrowserUtils.isMobile && !BrowserUtils.isTouchSupported && showUi();
+        (!BrowserUtils.isAndroid || !BrowserUtils.isIOS) && !BrowserUtils.isTouchSupported && showUi();
       },
     }, {
       name: 'focusin',
