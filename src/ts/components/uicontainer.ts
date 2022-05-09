@@ -164,8 +164,12 @@ export class UIContainer extends Container<UIContainerConfig> {
             }
             showUi();
           } else {
-            e.preventDefault();
-            hideUi();
+            let isTimeshifting = false;
+            player.on(PlayerEvent.TimeShift, () => {
+              isTimeshifting = true;
+            });
+            !isTimeshifting && hideUi();
+            isTimeshifting = false;
           }
         } else {
           e.preventDefault();
@@ -175,13 +179,13 @@ export class UIContainer extends Container<UIContainerConfig> {
       // When the mouse enters, we show the UI
       name: 'mouseenter',
       handler: () => {
-        !BrowserUtils.isTouchSupported && showUi();
+        !isMobile && showUi();
       },
     }, {
       // When the mouse moves within, we show the UI
       name: 'mousemove',
       handler: () => {
-        !BrowserUtils.isTouchSupported && showUi();
+        !isMobile && showUi();
       },
     }, {
       name: 'focusin',
