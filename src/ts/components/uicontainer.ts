@@ -93,6 +93,7 @@ export class UIContainer extends Container<UIContainerConfig> {
     let isFirstTouch = true;
     let playerState: PlayerUtils.PlayerState;
     let isUiBlocked = false;
+    const isMobile = BrowserUtils.isAndroid || BrowserUtils.isIOS;
 
     const hidingPrevented = (): boolean => {
       return config.hidePlayerStateExceptions && config.hidePlayerStateExceptions.indexOf(playerState) > -1;
@@ -183,13 +184,13 @@ export class UIContainer extends Container<UIContainerConfig> {
       // When the mouse enters, we show the UI
       name: 'mouseenter',
       handler: () => {
-        !BrowserUtils.isAndroid && !BrowserUtils.isIOS && showUi();
+        !isMobile && showUi();
       },
     }, {
       // When the mouse moves within, we show the UI
       name: 'mousemove',
       handler: () => {
-        !BrowserUtils.isAndroid && !BrowserUtils.isIOS && showUi();
+        !isMobile && showUi();
       },
     }, {
       name: 'focusin',
