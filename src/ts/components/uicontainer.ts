@@ -117,7 +117,7 @@ export class UIContainer extends Container<UIContainerConfig> {
       // Hide the UI only if it is shown
       if (isUiShown) {
           // hide if not casting, and if not Airplaying on Ios
-          if ((!player.isCasting() && (BrowserUtils.isIOS && !player.isAirplayActive() || !BrowserUtils.isIOS)) || isUiBlocked || !PlayerEvent.TimeShift) {
+          if ((!player.isCasting() && (BrowserUtils.isIOS && !player.isAirplayActive() || !BrowserUtils.isIOS)) || isUiBlocked) {
             // Issue a preview event to check if we are good to hide the controls
             let previewHideEventArgs = <CancelEventArgs>{};
             uimanager.onPreviewControlsHide.dispatch(this, previewHideEventArgs);
@@ -134,15 +134,6 @@ export class UIContainer extends Container<UIContainerConfig> {
       }
     };
 
-    if (window.bitmovin.customMessageHandler) {
-      window.bitmovin.customMessageHandler.on('blockUi', () => {
-        hideUi();
-        isUiBlocked = true;
-      });
-      window.bitmovin.customMessageHandler.on('unblockUi', () => {
-        isUiBlocked = false;
-      });
-    }
     // Timeout to defer UI hiding by the configured delay time
     this.uiHideTimeout = new Timeout(config.hideDelay, hideUi);
 
@@ -184,13 +175,13 @@ export class UIContainer extends Container<UIContainerConfig> {
       // When the mouse enters, we show the UI
       name: 'mouseenter',
       handler: () => {
-        !isMobile && showUi();
+        !BrowserUtils.isTouchSupported && showUi();
       },
     }, {
       // When the mouse moves within, we show the UI
       name: 'mousemove',
       handler: () => {
-        !isMobile && showUi();
+        !BrowserUtils.isTouchSupported && showUi();
       },
     }, {
       name: 'focusin',
