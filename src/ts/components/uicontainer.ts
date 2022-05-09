@@ -4,7 +4,7 @@ import {DOM} from '../dom';
 import {Timeout} from '../timeout';
 import {PlayerUtils} from '../playerutils';
 import {CancelEventArgs, EventDispatcher} from '../eventdispatcher';
-import {PlayerAPI, PlayerResizedEvent} from 'bitmovin-player';
+import {PlayerAPI, PlayerEvent, PlayerResizedEvent} from 'bitmovin-player';
 import {i18n} from '../localization/i18n';
 import {BrowserUtils} from '../browserutils';
 
@@ -117,7 +117,7 @@ export class UIContainer extends Container<UIContainerConfig> {
       // Hide the UI only if it is shown
       if (isUiShown) {
           // hide if not casting, and if not Airplaying on Ios
-          if ((!player.isCasting() && (BrowserUtils.isIOS && !player.isAirplayActive() || !BrowserUtils.isIOS)) || isUiBlocked) {
+          if ((!player.isCasting() && (BrowserUtils.isIOS && !player.isAirplayActive() || !BrowserUtils.isIOS)) || isUiBlocked || !PlayerEvent.TimeShift) {
             // Issue a preview event to check if we are good to hide the controls
             let previewHideEventArgs = <CancelEventArgs>{};
             uimanager.onPreviewControlsHide.dispatch(this, previewHideEventArgs);
