@@ -164,12 +164,15 @@ export class UIContainer extends Container<UIContainerConfig> {
             }
             showUi();
           } else {
-            let isTimeshifting = false;
-            player.on(PlayerEvent.TimeShift, () => {
-              isTimeshifting = true;
-            });
-            !isTimeshifting && hideUi();
-            isTimeshifting = false;
+            if (!isSeeking && !hidingPrevented()) {
+              hideUi();
+            }
+            // let isTimeshifting = false;
+            // player.on(PlayerEvent.TimeShift, () => {
+            //   isTimeshifting = true;
+            // });
+            // !isTimeshifting && hideUi();
+            // isTimeshifting = false;
           }
         } else {
           e.preventDefault();
