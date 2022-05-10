@@ -224,9 +224,9 @@ export class UIContainer extends Container<UIContainerConfig> {
         this.uiHideTimeout.start(); // Re-enable UI hide timeout after a seek
       }
     });
-    // player.on(player.exports.PlayerEvent.TimeShift, () => {
-    //   showUi();
-    // });
+    player.on(player.exports.PlayerEvent.TimeShift, () => {
+      showUi();
+    });
     player.on(player.exports.PlayerEvent.CastStarted, () => {
       !isUiBlocked && showUi(); // Show UI when a Cast session has started (UI will then stay permanently on during the session)
     });
