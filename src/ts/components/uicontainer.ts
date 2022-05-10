@@ -94,7 +94,6 @@ export class UIContainer extends Container<UIContainerConfig> {
     let playerState: PlayerUtils.PlayerState;
     let isUiBlocked = false;
     const isMobile = BrowserUtils.isAndroid || BrowserUtils.isIOS;
-    let isTimeshifting = false;
 
     const hidingPrevented = (): boolean => {
       return config.hidePlayerStateExceptions && config.hidePlayerStateExceptions.indexOf(playerState) > -1;
@@ -165,8 +164,12 @@ export class UIContainer extends Container<UIContainerConfig> {
             }
             showUi();
           } else {
-            e.preventDefault();
+            let isTimeshifting = false;
+            player.on(PlayerEvent.TimeShift, () => {
+              isTimeshifting = true;
+            });
             !isTimeshifting && hideUi();
+            isTimeshifting = false;
           }
         } else {
           e.preventDefault();
@@ -218,12 +221,8 @@ export class UIContainer extends Container<UIContainerConfig> {
         this.uiHideTimeout.start(); // Re-enable UI hide timeout after a seek
       }
     });
-    player.on(PlayerEvent.TimeShift, () => {
-      isTimeshifting = true;
+    player.on(player.exports.PlayerEvent.TimeShift, () => {
       showUi();
-    });
-    player.on(PlayerEvent.TimeShifted, () => {
-      isTimeshifting = false;
     });
     player.on(player.exports.PlayerEvent.CastStarted, () => {
       !isUiBlocked && showUi(); // Show UI when a Cast session has started (UI will then stay permanently on during the session)
