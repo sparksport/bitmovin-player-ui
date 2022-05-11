@@ -4,7 +4,7 @@ import {DOM} from '../dom';
 import {Timeout} from '../timeout';
 import {PlayerUtils} from '../playerutils';
 import {CancelEventArgs, EventDispatcher} from '../eventdispatcher';
-import {PlayerAPI, PlayerEvent, PlayerResizedEvent} from 'bitmovin-player';
+import {PlayerAPI, PlayerResizedEvent} from 'bitmovin-player';
 import {i18n} from '../localization/i18n';
 import {BrowserUtils} from '../browserutils';
 
@@ -167,12 +167,6 @@ export class UIContainer extends Container<UIContainerConfig> {
             if (!isSeeking && !hidingPrevented()) {
               hideUi();
             }
-            // let isTimeshifting = false;
-            // player.on(PlayerEvent.TimeShift, () => {
-            //   isTimeshifting = true;
-            // });
-            // !isTimeshifting && hideUi();
-            // isTimeshifting = false;
           }
         } else {
           e.preventDefault();
