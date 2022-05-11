@@ -93,6 +93,7 @@ export class UIContainer extends Container<UIContainerConfig> {
     let isFirstTouch = true;
     let playerState: PlayerUtils.PlayerState;
     let isUiBlocked = false;
+    const isMobile = BrowserUtils.isAndroid || BrowserUtils.isIOS;
 
     const hidingPrevented = (): boolean => {
       return config.hidePlayerStateExceptions && config.hidePlayerStateExceptions.indexOf(playerState) > -1;
@@ -113,32 +114,26 @@ export class UIContainer extends Container<UIContainerConfig> {
     };
 
     let hideUi = () => {
-      // Hide the UI only if it is shown, and if not casting, and if not Airplaying on Ios
-      if (isUiShown && !player.isCasting() && (BrowserUtils.isIOS && !player.isAirplayActive() || !BrowserUtils.isIOS)) {
-        // Issue a preview event to check if we are good to hide the controls
-        let previewHideEventArgs = <CancelEventArgs>{};
-        uimanager.onPreviewControlsHide.dispatch(this, previewHideEventArgs);
+      // Hide the UI only if it is shown
+      if (isUiShown) {
+          // hide if not casting, and if not Airplaying on Ios
+          if ((!player.isCasting() && (BrowserUtils.isIOS && !player.isAirplayActive() || !BrowserUtils.isIOS)) || isUiBlocked) {
+            // Issue a preview event to check if we are good to hide the controls
+            let previewHideEventArgs = <CancelEventArgs>{};
+            uimanager.onPreviewControlsHide.dispatch(this, previewHideEventArgs);
 
-        if (!previewHideEventArgs.cancel) {
-          // If the preview wasn't canceled, let subscribers know that they should now hide themselves
-          uimanager.onControlsHide.dispatch(this);
-          isUiShown = false;
-        } else {
-          // If the hide preview was canceled, continue to show UI
-          showUi();
+            if (!previewHideEventArgs.cancel) {
+              // If the preview wasn't canceled, let subscribers know that they should now hide themselves
+              uimanager.onControlsHide.dispatch(this);
+              isUiShown = false;
+            } else {
+              // If the hide preview was canceled, continue to show UI
+              showUi();
+            }
         }
       }
     };
 
-    if (window.bitmovin.customMessageHandler) {
-      window.bitmovin.customMessageHandler.on('blockUi', () => {
-        hideUi();
-        isUiBlocked = true;
-      });
-      window.bitmovin.customMessageHandler.on('unblockUi', () => {
-        isUiBlocked = false;
-      });
-    }
     // Timeout to defer UI hiding by the configured delay time
     this.uiHideTimeout = new Timeout(config.hideDelay, hideUi);
 
@@ -169,8 +164,9 @@ export class UIContainer extends Container<UIContainerConfig> {
             }
             showUi();
           } else {
-            e.preventDefault();
-            hideUi();
+            if (!isSeeking && !hidingPrevented()) {
+              hideUi();
+            }
           }
         } else {
           e.preventDefault();
@@ -180,13 +176,13 @@ export class UIContainer extends Container<UIContainerConfig> {
       // When the mouse enters, we show the UI
       name: 'mouseenter',
       handler: () => {
-        !BrowserUtils.isMobile && showUi();
+        !isMobile && showUi();
       },
     }, {
       // When the mouse moves within, we show the UI
       name: 'mousemove',
       handler: () => {
-        !BrowserUtils.isMobile && showUi();
+        !isMobile && showUi();
       },
     }, {
       name: 'focusin',
@@ -205,7 +201,7 @@ export class UIContainer extends Container<UIContainerConfig> {
         // When a seek is going on, the seek scrub pointer may exit the UI area while still seeking, and we do not
         // hide the UI in such cases
         if (!isSeeking && !hidingPrevented()) {
-          this.uiHideTimeout.start();
+          hideUi();
         }
       },
     }];
@@ -223,10 +219,10 @@ export class UIContainer extends Container<UIContainerConfig> {
       }
     });
     player.on(player.exports.PlayerEvent.TimeShift, () => {
-        showUi();
+      showUi();
     });
     player.on(player.exports.PlayerEvent.CastStarted, () => {
-      showUi(); // Show UI when a Cast session has started (UI will then stay permanently on during the session)
+      !isUiBlocked && showUi(); // Show UI when a Cast session has started (UI will then stay permanently on during the session)
     });
     this.playerStateChange.subscribe((_, state) => {
       playerState = state;
