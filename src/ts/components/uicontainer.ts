@@ -201,7 +201,8 @@ export class UIContainer extends Container<UIContainerConfig> {
         // When a seek is going on, the seek scrub pointer may exit the UI area while still seeking, and we do not
         // hide the UI in such cases
         if (!isSeeking && !hidingPrevented()) {
-          hideUi();
+          // Avoid using hideUi() since will introduce selectbox flash issue
+          this.uiHideTimeout.start();
         }
       },
     }];
