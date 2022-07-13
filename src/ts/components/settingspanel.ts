@@ -85,8 +85,6 @@ export class SettingsPanel extends Container<SettingsPanelConfig> {
 
     let config = this.getConfig();
 
-    uimanager.onControlsHide.subscribe(() => this.hideHoveredSelectBoxes());
-
     if (config.hideDelay > -1) {
       this.hideTimeout = new Timeout(config.hideDelay, () => {
         this.hide();
