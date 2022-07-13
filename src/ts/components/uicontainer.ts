@@ -203,6 +203,7 @@ export class UIContainer extends Container<UIContainerConfig> {
         if (!isSeeking && !hidingPrevented()) {
           // Avoid using hideUi() since will introduce selectbox flash issue
           this.uiHideTimeout.start();
+          //hideUi()
         }
       },
     }];
