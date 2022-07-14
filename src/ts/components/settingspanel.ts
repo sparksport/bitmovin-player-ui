@@ -85,6 +85,8 @@ export class SettingsPanel extends Container<SettingsPanelConfig> {
 
     let config = this.getConfig();
 
+    uimanager.onControlsHide.subscribe(() => this.hideHoveredSelectBoxes());
+
     if (config.hideDelay > -1) {
       this.hideTimeout = new Timeout(config.hideDelay, () => {
         this.hide();
@@ -361,6 +363,7 @@ export class SettingsPanel extends Container<SettingsPanelConfig> {
    * while the settings panel does. This would leave a floating select box, which is just weird
    */
   private hideHoveredSelectBoxes(): void {
+    const currentSettingPanelOpacity = this.getDomElement().css('opacity');
     this.getComputedItems().forEach((item: SettingsPanelItem) => {
       if (item.isActive() && (item as any).setting instanceof SelectBox) {
         const selectBox = (item as any).setting as SelectBox;
@@ -374,7 +377,9 @@ export class SettingsPanel extends Container<SettingsPanelConfig> {
 
         // updating the display to none marks the select-box as inactive, so it will be hidden with the rest
         // we just have to make sure to reset this as soon as possible
-        selectBox.getDomElement().css('display', 'none');
+        if (currentSettingPanelOpacity === '0') {
+          selectBox.getDomElement().css('display', 'none');
+        }
         if (window.requestAnimationFrame) {
           requestAnimationFrame(() => {
             selectBox.getDomElement().css('display', oldDisplay);
