@@ -197,14 +197,18 @@ export class UIContainer extends Container<UIContainerConfig> {
     }, {
       // When the mouse leaves, we can prepare to hide the UI, except a seek is going on
       name: 'mouseleave',
-      handler: () => {
+      handler: (event: MouseEvent) => {
+        // Hack to prevent the mouseleave event from triggering when the mouse is over the select box
+        if (event.relatedTarget === null) {
+          return;
+        }
         // When a seek is going on, the seek scrub pointer may exit the UI area while still seeking, and we do not
         // hide the UI in such cases
         if (!isSeeking && !hidingPrevented()) {
           hideUi();
         }
       },
-    }];
+      }];
 
     this.userInteractionEvents.forEach((event) => this.userInteractionEventSource.on(event.name, event.handler));
 

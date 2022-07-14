@@ -96,7 +96,12 @@ export class SettingsPanel extends Container<SettingsPanelConfig> {
         // On mouse enter clear the timeout
         this.hideTimeout.clear();
       });
-      this.getDomElement().on('mouseleave', () => {
+      this.getDomElement().on('mouseleave', (event: MouseEvent) => {
+        // On mouse leave from the ui container, hide the settings panel immediately
+        if (event.relatedTarget !== null) {
+          this.hide();
+          return;
+        }
         // On mouse leave activate the timeout
         this.hideTimeout.reset();
       });
@@ -376,7 +381,7 @@ export class SettingsPanel extends Container<SettingsPanelConfig> {
 
         // updating the display to none marks the select-box as inactive, so it will be hidden with the rest
         // we just have to make sure to reset this as soon as possible
-        selectBox.getDomElement().css('display', 'none');
+          selectBox.getDomElement().css('display', 'none');
         if (window.requestAnimationFrame) {
           requestAnimationFrame(() => {
             selectBox.getDomElement().css('display', oldDisplay);
