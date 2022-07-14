@@ -96,7 +96,12 @@ export class SettingsPanel extends Container<SettingsPanelConfig> {
         // On mouse enter clear the timeout
         this.hideTimeout.clear();
       });
-      this.getDomElement().on('mouseleave', () => {
+      this.getDomElement().on('mouseleave', (event: MouseEvent) => {
+        // On mouse leave from the ui container, hide the settings panel immediately
+        if (event.relatedTarget !== null) {
+          this.hide();
+          return;
+        }
         // On mouse leave activate the timeout
         this.hideTimeout.reset();
       });
