@@ -17,7 +17,7 @@ The changes can be found in `uicontainer.ts`.
 When you make a feature branch, **CircleCI** will run a build and all the tests for you. Optionally, you can also choose to publish the NPM package (so you can test your changes with the `spark-player-skin` repository).
 It will publish the package with the version number in package.json, with a `-beta-#` suffix, where the # is replaced by a number, the number of times you've chosen to publish. So if you publish a beta 3 times, there would be a `-beta-1`, `-beta-2`, and a `-beta-3` in the NPM registry.
 
-When you are happy with your changes, create a pull request to the `main` branch, **Make sure you are targeting the following base repository `sparksport/bitmovin-player-ui`**
+When you are happy with your changes, create a pull request to the `main` branch, **Make sure you are targeting the following base repository `sparksport/bitmovin-player-ui` and the `main` branch**
 
 Once the PR accepted, CircleCi will publish the new version.
 
