@@ -8,121 +8,18 @@ To update this fork you can follow these instructions: https://docs.github.com/e
 
 This fork contains a patch to enable **hidding the UI on tap for Mobile UI** which is not a feature that Bitmovin planned to implement anytime soon. 
 
-Here is the content of the patch provided by Bitmovin: 
-```diff
-diff --git a/src/scss/skin-modern/components/_playbacktoggleoverlay.scss b/src/scss/skin-modern/components/_playbacktoggleoverlay.scss
-index 7fb854b..cdc4ea5 100644
---- a/src/scss/skin-modern/components/_playbacktoggleoverlay.scss
-+++ b/src/scss/skin-modern/components/_playbacktoggleoverlay.scss
-@@ -3,8 +3,15 @@
- .#{$prefix}-ui-playbacktoggle-overlay {
-   @extend %ui-container;
-+  @include layout-cover;
-+  @include layout-center-children-in-container;
- 
--  .#{$prefix}-ui-hugeplaybacktogglebutton {
--    @include layout-cover;
-+  //.#{$prefix}-ui-hugeplaybacktogglebutton {
-+  //  @include layout-cover;
-+  //}
-+
-+  // use the small button instead of the huge one
-+  .#{$prefix}-ui-playbacktogglebutton {
-+    @include hidden-animated;
-   }
- }
-diff --git a/src/ts/components/button.ts b/src/ts/components/button.ts
-index b085580..4daa47b 100644
---- a/src/ts/components/button.ts
-+++ b/src/ts/components/button.ts
-@@ -59,6 +59,11 @@ export class Button<Config extends ButtonConfig> extends Component<Config> {
-       this.onClickEvent();
-     });
- 
-+    buttonElement.on('touchend', (e) => {
-+      this.onClickEvent();
-+      e.preventDefault(); // do not propagate further
-+    });
-+
-     return buttonElement;
-   }
- 
-diff --git a/src/ts/components/playbacktoggleoverlay.ts b/src/ts/components/playbacktoggleoverlay.ts
-index cc8920f..9b3f730 100644
---- a/src/ts/components/playbacktoggleoverlay.ts
-+++ b/src/ts/components/playbacktoggleoverlay.ts
-@@ -1,21 +1,38 @@
- import {Container, ContainerConfig} from './container';
- import {HugePlaybackToggleButton} from './hugeplaybacktogglebutton';
-+import { PlaybackToggleButton } from './playbacktogglebutton';
-+import { UIInstanceManager } from '../uimanager';
-+import { PlayerAPI } from 'bitmovin-player';
- 
- /**
-  * Overlays the player and displays error messages.
-  */
- export class PlaybackToggleOverlay extends Container<ContainerConfig> {
- 
--  private playbackToggleButton: HugePlaybackToggleButton;
-+  private playbackToggleButton: PlaybackToggleButton;
- 
-   constructor(config: ContainerConfig = {}) {
-     super(config);
- 
--    this.playbackToggleButton = new HugePlaybackToggleButton();
-+    // Replace huge button which takes the full screen with a small one
-+    this.playbackToggleButton = new PlaybackToggleButton();
- 
-     this.config = this.mergeConfig(config, {
-       cssClass: 'ui-playbacktoggle-overlay',
-       components: [this.playbackToggleButton],
-     }, this.config);
-   }
--}
-\ No newline at end of file
-+
-+  configure(player: PlayerAPI, uimanager: UIInstanceManager): void {
-+    super.configure(player, uimanager);
-+
-+    // Hide only the button accordingly (not the container: this)
-+    uimanager.onControlsHide.subscribe(() => {
-+      this.playbackToggleButton.hide();
-+    });
-+
-+    uimanager.onControlsShow.subscribe(() => {
-+      this.playbackToggleButton.show();
-+    });
-+  }
-+}
-diff --git a/src/ts/components/uicontainer.ts b/src/ts/components/uicontainer.ts
-index 6f1967e..1e50c73 100644
---- a/src/ts/components/uicontainer.ts
-+++ b/src/ts/components/uicontainer.ts
-@@ -142,20 +142,10 @@ export class UIContainer extends Container<UIContainerConfig> {
-             e.preventDefault();
-           }
-           showUi();
-+        } else {
-+          hideUi();
-         }
-       },
--    }, {
--      // When the mouse enters, we show the UI
--      name: 'mouseenter',
--      handler: () => {
--        showUi();
--      },
--    }, {
--      // When the mouse moves within, we show the UI
--      name: 'mousemove',
--      handler: () => {
--        showUi();
--      },
-     }, {
-       name: 'focusin',
-       handler: () => {
+The changes can be found in `uicontainer.ts`.
 
-```
+## CICD Pipeline (Spark Sport)
+
+#### Versioning : Major and minor version follows Bitmovin `Bitmovin Player Ui`. When we (Spark Sport) make changes, we only need to bump the patch version.
+
+When you make a feature branch, **CircleCI** will run a build and all the tests for you. Optionally, you can also choose to publish the NPM package (so you can test your changes with the `spark-player-skin` repository).
+It will publish the package with the version number in package.json, with a `-beta-#` suffix, where the # is replaced by a number, the number of times you've chosen to publish. So if you publish a beta 3 times, there would be a `-beta-1`, `-beta-2`, and a `-beta-3` in the NPM registry.
+
+When you are happy with your changes, create a pull request to the `main` branch, **Make sure you are targeting the following base repository `sparksport/bitmovin-player-ui`**
+
+Once the PR accepted, CircleCi will publish the new version.
 
 # Bitmovin Player UI [![npm version](https://badge.fury.io/js/bitmovin-player-ui.svg)](https://badge.fury.io/js/bitmovin-player-ui) [![Build Status](https://app.travis-ci.com/bitmovin/bitmovin-player-ui.svg?branch=develop)](https://app.travis-ci.com/bitmovin/bitmovin-player-ui)
 The Bitmovin Adaptive Streaming Player UI
@@ -152,23 +49,19 @@ The UI framework is also available in the NPM repository and comes with all sour
  0. Clone Git repository
  1. Install node.js
  2. Install Gulp: `npm install --global gulp-cli`
- 3. Install required npm packages: `npm install`
+ 3. Install required npm packages: `npm ci`
  4. Run Gulp tasks (`gulp --tasks`)
   * `gulp` to build project into `dist` directory
   * `gulp watch` to develop and rebuild changed files automatically
   * `gulp serve` to open test page in browser, build and reload changed files automatically
   * `gulp lint` to lint TypeScript and SASS files
-  * `gulp build-prod` to build project with minified files into `dist` directory
+  * ~~`gulp build-prod` to build project with minified files into `dist` directory~~
   
 To take a look at the project, run `gulp serve`. For changes, check our [CHANGELOG](CHANGELOG.md). This UI framework version is for player v8. The UI framework for player v7 can be found in the `support/v2.x` branch.
 
 ## Contributing
 
-Pull requests are welcome! Please check the [contribution guidelines](CONTRIBUTING.md). 
-
-## CICD Pipeline
-
-When you make a feature branch, CircleCI will run a build and all the tests for you. Optionally, you can also choose to publish the NPM package (so you can test your changes with the `spark-player-skin` repository). It will publish the package with the version number in package.json, with a `-beta-#` suffix, where the # is replaced by a number, the number of times you've chosen to publish. So if you publish a beta 3 times, there would be a `-beta-1`, `-beta-2`, and a `-beta-3` in the NPM registry.
+Pull requests are welcome! Please check the [contribution guidelines](CONTRIBUTING.md).
 
 ## Introduction
 
