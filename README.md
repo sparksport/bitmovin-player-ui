@@ -19,7 +19,7 @@ It will publish the package with the version number in package.json, with a `-be
 
 When you are happy with your changes, create a pull request to the `main` branch, **Make sure you are targeting the following base repository `sparksport/bitmovin-player-ui` and the `main` branch**
 
-Once the PR accepted, CircleCi will publish the new version.
+Once the PR accepted, CircleCi will publish the new version after approval (that can be done by yourself in the pipeline).
 
 # Bitmovin Player UI [![npm version](https://badge.fury.io/js/bitmovin-player-ui.svg)](https://badge.fury.io/js/bitmovin-player-ui) [![Build Status](https://app.travis-ci.com/bitmovin/bitmovin-player-ui.svg?branch=develop)](https://app.travis-ci.com/bitmovin/bitmovin-player-ui)
 The Bitmovin Adaptive Streaming Player UI
@@ -47,10 +47,10 @@ The UI framework is also available in the NPM repository and comes with all sour
 ## Getting Started with Development
 
  0. Clone Git repository
- 1. Install node.js
- 2. Install Gulp: `npm install --global gulp-cli`
- 3. Install required npm packages: `npm ci`
- 4. Run Gulp tasks (`gulp --tasks`)
+ 1. Make sure you are using node version `14.18.0`
+ 3. Install Gulp: `npm install --global gulp-cli`
+ 4. Install required npm packages: `npm ci`
+ 5. Run Gulp tasks (`gulp --tasks`)
   * `gulp` to build project into `dist` directory
   * `gulp watch` to develop and rebuild changed files automatically
   * `gulp serve` to open test page in browser, build and reload changed files automatically
