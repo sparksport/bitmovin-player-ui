@@ -42,6 +42,11 @@ export namespace PlayerUtils {
       return currentTime;
     }
 
+    // return relative time when casting since the Shaka player use relative time for current time
+    if (player.isCasting()) {
+      return currentTime;
+    }
+
     const seekableRangeStart = PlayerUtils.getSeekableRangeStart(player, 0);
     return currentTime - seekableRangeStart;
   }
