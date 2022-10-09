@@ -469,8 +469,11 @@ export class SeekBar extends Component<SeekBarConfig> {
       this.player.timeShift(maxTimeShift - (maxTimeShift * (percentage / 100)), 'ui');
     } else {
       const seekableRangeStart = PlayerUtils.getSeekableRangeStart(this.player, 0);
+      console.log("TCL: privateseek -> seekableRangeStart", seekableRangeStart)
       const relativeSeekTarget = this.player.getDuration() * (percentage / 100);
+      console.log("TCL: privateseek -> relativeSeekTarget", relativeSeekTarget)
       const absoluteSeekTarget = relativeSeekTarget + seekableRangeStart;
+      console.log("TCL: privateseek -> absoluteSeekTarget", absoluteSeekTarget)
       this.player.seek(absoluteSeekTarget, 'ui');
     }
   };
